@@ -37,8 +37,18 @@ const NavBar = () => {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost">Sign In</Button>
-            <Button variant="hero">Get Started</Button>
+            <Button 
+              variant="ghost"
+              onClick={() => window.location.href = '/auth'}
+            >
+              Sign In
+            </Button>
+            <Button 
+              variant="hero"
+              onClick={() => window.location.href = '/auth'}
+            >
+              Get Started
+            </Button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -70,8 +80,18 @@ const NavBar = () => {
                 Analytics
               </a>
               <div className="flex flex-col space-y-2 pt-4">
-                <Button variant="ghost">Sign In</Button>
-                <Button variant="hero">Get Started</Button>
+                <Button 
+                  variant="ghost"
+                  onClick={() => window.location.href = '/auth'}
+                >
+                  Sign In
+                </Button>
+                <Button 
+                  variant="hero"
+                  onClick={() => window.location.href = '/auth'}
+                >
+                  Get Started
+                </Button>
               </div>
             </div>
           </div>
