@@ -2,41 +2,73 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Msafara IoT Platform Design System - Modern, Tech-Forward, Sustainable */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Base Colors */
+    --background: 210 30% 98%;
+    --foreground: 210 15% 15%;
 
+    /* Card System */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 210 15% 15%;
 
+    /* Popover System */
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 210 15% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Electric Blue Primary - Technology & Innovation */
+    --primary: 205 95% 55%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 205 85% 70%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Eco Green Secondary - Sustainability */
+    --secondary: 145 70% 45%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-glow: 145 60% 60%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Neutral Muted */
+    --muted: 210 20% 95%;
+    --muted-foreground: 210 15% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Success Green - Analytics & Growth */
+    --accent: 145 70% 45%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Destructive Red */
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Borders & Inputs */
+    --border: 210 20% 90%;
+    --input: 210 20% 95%;
+    --ring: 205 95% 55%;
 
-    --radius: 0.5rem;
+    /* Radius */
+    --radius: 0.75rem;
+
+    /* Custom Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(205 95% 55%), hsl(205 85% 70%));
+    --gradient-secondary: linear-gradient(135deg, hsl(145 70% 45%), hsl(145 60% 60%));
+    --gradient-hero: linear-gradient(135deg, hsl(205 95% 55%) 0%, hsl(145 70% 45%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(210 30% 98%) 100%);
+    
+    /* IoT Dashboard Colors */
+    --iot-active: 145 70% 45%;
+    --iot-warning: 35 90% 55%;
+    --iot-danger: 0 75% 55%;
+    --iot-info: 205 95% 55%;
+
+    /* Shadows */
+    --shadow-primary: 0 10px 30px -5px hsl(205 95% 55% / 0.3);
+    --shadow-secondary: 0 10px 30px -5px hsl(145 70% 45% / 0.3);
+    --shadow-card: 0 4px 20px -2px hsl(210 15% 15% / 0.1);
+    --shadow-glow: 0 0 40px hsl(205 85% 70% / 0.4);
+
+    /* Animations */
+    --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-quick: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
     --sidebar-background: 0 0% 98%;
 
