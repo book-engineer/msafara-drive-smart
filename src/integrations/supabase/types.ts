@@ -47,6 +47,181 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          phone: string | null
+          role: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          role?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          role?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      purchases: {
+        Row: {
+          created_at: string
+          id: string
+          payment_plan: string | null
+          purchase_price: number
+          status: string | null
+          updated_at: string
+          user_id: string
+          vehicle_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          payment_plan?: string | null
+          purchase_price: number
+          status?: string | null
+          updated_at?: string
+          user_id: string
+          vehicle_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          payment_plan?: string | null
+          purchase_price?: number
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "purchases_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ride_analytics: {
+        Row: {
+          battery_consumed: number | null
+          co2_saved: number | null
+          created_at: string
+          distance_km: number
+          duration_minutes: number
+          fuel_cost_saved: number | null
+          id: string
+          location_end: string | null
+          location_start: string | null
+          ride_date: string
+          user_id: string
+          vehicle_id: string
+        }
+        Insert: {
+          battery_consumed?: number | null
+          co2_saved?: number | null
+          created_at?: string
+          distance_km: number
+          duration_minutes: number
+          fuel_cost_saved?: number | null
+          id?: string
+          location_end?: string | null
+          location_start?: string | null
+          ride_date?: string
+          user_id: string
+          vehicle_id: string
+        }
+        Update: {
+          battery_consumed?: number | null
+          co2_saved?: number | null
+          created_at?: string
+          distance_km?: number
+          duration_minutes?: number
+          fuel_cost_saved?: number | null
+          id?: string
+          location_end?: string | null
+          location_start?: string | null
+          ride_date?: string
+          user_id?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ride_analytics_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicles: {
+        Row: {
+          availability_status: string | null
+          battery_capacity: string | null
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          max_speed: number | null
+          name: string
+          owner_id: string | null
+          price: number
+          range_km: number | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          availability_status?: string | null
+          battery_capacity?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          max_speed?: number | null
+          name: string
+          owner_id?: string | null
+          price: number
+          range_km?: number | null
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          availability_status?: string | null
+          battery_capacity?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          max_speed?: number | null
+          name?: string
+          owner_id?: string | null
+          price?: number
+          range_km?: number | null
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
