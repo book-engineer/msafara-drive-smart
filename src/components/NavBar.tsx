@@ -30,8 +30,8 @@ const NavBar = () => {
             <a href="#financing" className="text-foreground/80 hover:text-primary transition-colors">
               PAYS Financing
             </a>
-            <a href="#analytics" className="text-foreground/80 hover:text-primary transition-colors">
-              Analytics
+            <a href="/dashboard" className="text-foreground/80 hover:text-primary transition-colors">
+              Real-Time Dashboard
             </a>
           </div>
 
@@ -76,8 +76,8 @@ const NavBar = () => {
               <a href="#financing" className="text-foreground/80 hover:text-primary transition-colors">
                 PAYS Financing
               </a>
-              <a href="#analytics" className="text-foreground/80 hover:text-primary transition-colors">
-                Analytics
+              <a href="/dashboard" className="text-foreground/80 hover:text-primary transition-colors">
+                Real-Time Dashboard
               </a>
               <div className="flex flex-col space-y-2 pt-4">
                 <Button 
