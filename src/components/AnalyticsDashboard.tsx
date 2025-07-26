@@ -1,35 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
-import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell
-} from 'recharts';
-import { 
-  Battery, 
-  MapPin, 
-  DollarSign, 
-  Leaf, 
-  Clock, 
-  TrendingUp,
-  Users,
-  Car,
-  Zap,
-  Shield
-} from 'lucide-react';
+import MetricsGrid from './dashboard/MetricsGrid';
+import RealTimeCharts from './dashboard/RealTimeCharts';
+import StatusCards from './dashboard/StatusCards';
+import IoTMonitoring from './dashboard/IoTMonitoring';
+import PayAsYouSaveChart from './dashboard/PayAsYouSaveChart';
 
 interface AnalyticsData {
   totalRides: number;
@@ -82,7 +59,66 @@ export default function AnalyticsDashboard() {
   useEffect(() => {
     fetchAnalytics();
     fetchAlerts();
+    setupRealTimeSubscriptions();
   }, []);
+
+  const setupRealTimeSubscriptions = () => {
+    // Subscribe to ride analytics changes
+    const rideAnalyticsChannel = supabase
+      .channel('ride-analytics-changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'ride_analytics'
+      }, () => {
+        fetchAnalytics();
+      })
+      .subscribe();
+
+    // Subscribe to power alerts changes
+    const alertsChannel = supabase
+      .channel('power-alerts-changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'power_alerts'
+      }, () => {
+        fetchAlerts();
+      })
+      .subscribe();
+
+    // Subscribe to vehicles changes
+    const vehiclesChannel = supabase
+      .channel('vehicles-changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'vehicles'
+      }, () => {
+        fetchAnalytics();
+      })
+      .subscribe();
+
+    // Subscribe to purchases changes
+    const purchasesChannel = supabase
+      .channel('purchases-changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'purchases'
+      }, () => {
+        fetchAnalytics();
+      })
+      .subscribe();
+
+    // Cleanup function
+    return () => {
+      supabase.removeChannel(rideAnalyticsChannel);
+      supabase.removeChannel(alertsChannel);
+      supabase.removeChannel(vehiclesChannel);
+      supabase.removeChannel(purchasesChannel);
+    };
+  };
 
   const fetchAnalytics = async () => {
     try {
@@ -140,75 +176,26 @@ export default function AnalyticsDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-electric-blue to-eco-green bg-clip-text text-transparent">
-            Analytics Dashboard
+            Real-Time Analytics Dashboard
           </h1>
           <p className="text-muted-foreground">
-            Real-time insights into your IoT mobility platform
+            Live insights into your IoT mobility platform with real-time updates
           </p>
         </div>
-        <Badge variant="outline" className="bg-eco-green/10 border-eco-green/30">
-          Live Data
+        <Badge variant="outline" className="bg-eco-green/10 border-eco-green/30 animate-pulse">
+          🔴 Live Data
         </Badge>
       </div>
 
       {/* Key Metrics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="border-white/10 backdrop-blur-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Rides</CardTitle>
-            <Car className="h-4 w-4 text-electric-blue" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{analyticsData.totalRides.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              <TrendingUp className="inline h-3 w-3 mr-1" />
-              +12% from last month
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-white/10 backdrop-blur-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Distance Traveled</CardTitle>
-            <MapPin className="h-4 w-4 text-eco-green" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{analyticsData.totalDistance.toLocaleString()} km</div>
-            <p className="text-xs text-muted-foreground">
-              <TrendingUp className="inline h-3 w-3 mr-1" />
-              +8% from last month
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-white/10 backdrop-blur-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Savings</CardTitle>
-            <DollarSign className="h-4 w-4 text-amber-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">${analyticsData.totalSavings.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">
-              <TrendingUp className="inline h-3 w-3 mr-1" />
-              +15% from last month
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-white/10 backdrop-blur-sm">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">CO₂ Saved</CardTitle>
-            <Leaf className="h-4 w-4 text-eco-green" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{analyticsData.co2Saved} tons</div>
-            <p className="text-xs text-muted-foreground">
-              <TrendingUp className="inline h-3 w-3 mr-1" />
-              +22% from last month
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      <MetricsGrid 
+        metrics={{
+          totalRides: analyticsData.totalRides,
+          totalDistance: analyticsData.totalDistance,
+          totalSavings: analyticsData.totalSavings,
+          co2Saved: analyticsData.co2Saved
+        }}
+      />
 
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList className="grid w-full grid-cols-4">
@@ -219,222 +206,34 @@ export default function AnalyticsDashboard() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Card className="border-white/10 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle>Ride Analytics</CardTitle>
-                <CardDescription>Daily ride patterns and usage trends</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={mockRideData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" />
-                    <YAxis stroke="hsl(var(--muted-foreground))" />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: 'hsl(var(--background))', 
-                        border: '1px solid hsl(var(--border))',
-                        borderRadius: '8px'
-                      }} 
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="rides" 
-                      stroke="hsl(var(--electric-blue))" 
-                      strokeWidth={2}
-                      dot={{ fill: 'hsl(var(--electric-blue))' }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            <Card className="border-white/10 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle>Vehicle Distribution</CardTitle>
-                <CardDescription>Active fleet composition</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={vehicleTypeData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      {vehicleTypeData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="border-white/10 backdrop-blur-sm">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Active Vehicles</CardTitle>
-                <Zap className="h-4 w-4 text-electric-blue" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{analyticsData.activeVehicles}</div>
-                <Progress value={85} className="mt-2" />
-                <p className="text-xs text-muted-foreground mt-1">85% operational</p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-white/10 backdrop-blur-sm">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-                <Users className="h-4 w-4 text-eco-green" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{analyticsData.totalUsers}</div>
-                <Progress value={78} className="mt-2" />
-                <p className="text-xs text-muted-foreground mt-1">78% active this month</p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-white/10 backdrop-blur-sm">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Payment Compliance</CardTitle>
-                <Shield className="h-4 w-4 text-amber-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{analyticsData.paymentCompliance}%</div>
-                <Progress value={analyticsData.paymentCompliance} className="mt-2" />
-                <p className="text-xs text-muted-foreground mt-1">Excellent compliance rate</p>
-              </CardContent>
-            </Card>
-          </div>
+          <RealTimeCharts 
+            rideData={mockRideData}
+            vehicleTypeData={vehicleTypeData}
+          />
+          
+          <StatusCards 
+            activeVehicles={analyticsData.activeVehicles}
+            totalUsers={analyticsData.totalUsers}
+            paymentCompliance={analyticsData.paymentCompliance}
+          />
         </TabsContent>
 
         <TabsContent value="fleet" className="space-y-4">
-          <Card className="border-white/10 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle>Battery Health Monitoring</CardTitle>
-              <CardDescription>Real-time battery status across your fleet</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {batteryHealthData.map((vehicle, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 rounded-lg border border-white/10">
-                    <div className="flex items-center space-x-3">
-                      <Battery className="h-5 w-5 text-electric-blue" />
-                      <div>
-                        <p className="font-medium">{vehicle.vehicle}</p>
-                        <p className="text-sm text-muted-foreground">{vehicle.status}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Progress value={vehicle.health} className="w-24" />
-                      <span className="text-sm font-medium">{vehicle.health}%</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <IoTMonitoring 
+            batteryHealthData={batteryHealthData}
+            alertsData={alertsData}
+          />
         </TabsContent>
 
         <TabsContent value="payments" className="space-y-4">
-          <Card className="border-white/10 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle>Pay-As-You-Save Analytics</CardTitle>
-              <CardDescription>Revenue and payment tracking</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={mockRideData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" />
-                  <YAxis stroke="hsl(var(--muted-foreground))" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--background))', 
-                      border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px'
-                    }} 
-                  />
-                  <Bar dataKey="savings" fill="hsl(var(--eco-green))" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+          <PayAsYouSaveChart data={mockRideData} />
         </TabsContent>
 
         <TabsContent value="iot" className="space-y-4">
-          <Card className="border-white/10 backdrop-blur-sm">
-            <CardHeader>
-              <CardTitle>IoT Device Status</CardTitle>
-              <CardDescription>Real-time monitoring of connected devices</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="p-4 rounded-lg border border-white/10">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium">GPS Tracking</span>
-                    <Badge variant="secondary" className="bg-eco-green/20 text-eco-green">Online</Badge>
-                  </div>
-                  <p className="text-2xl font-bold">24/24</p>
-                  <p className="text-xs text-muted-foreground">Devices connected</p>
-                </div>
-                
-                <div className="p-4 rounded-lg border border-white/10">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium">Remote Locking</span>
-                    <Badge variant="secondary" className="bg-electric-blue/20 text-electric-blue">Active</Badge>
-                  </div>
-                  <p className="text-2xl font-bold">100%</p>
-                  <p className="text-xs text-muted-foreground">System uptime</p>
-                </div>
-                
-                <div className="p-4 rounded-lg border border-white/10">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium">Tamper Detection</span>
-                    <Badge variant="secondary" className="bg-amber-500/20 text-amber-500">Monitoring</Badge>
-                  </div>
-                  <p className="text-2xl font-bold">0</p>
-                  <p className="text-xs text-muted-foreground">Alerts today</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {alertsData.length > 0 && (
-            <Card className="border-white/10 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle>Recent System Alerts</CardTitle>
-                <CardDescription>Latest IoT monitoring alerts</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {alertsData.map((alert: any, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 rounded-lg border border-white/10">
-                      <div>
-                        <p className="font-medium">{alert.alert_message}</p>
-                        <p className="text-sm text-muted-foreground">
-                          Grid: {alert.grid_state} | Battery: {alert.battery_level}%
-                        </p>
-                      </div>
-                      <Badge variant={alert.acknowledged ? "secondary" : "destructive"}>
-                        {alert.acknowledged ? "Resolved" : "Active"}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          <IoTMonitoring 
+            batteryHealthData={batteryHealthData}
+            alertsData={alertsData}
+          />
         </TabsContent>
       </Tabs>
     </div>
